@@ -67,6 +67,7 @@ termux_install_temporary_glibc() {
 	tar -xJf "$PATH_TMP_GLIBC/$GLIBC_PKG" -C "$PATH_TMP_GLIBC" data
 	# Move the extracted glibc into our app namespace and update the prefix
 	if [ -d "$PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC" ]; then
+		mkdir -p "$PATH_TMP_GLIBC/$NEW_PREFIX_TMP_GLIBC"
 		mv "$PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC" "$PATH_TMP_GLIBC/$NEW_PREFIX_TMP_GLIBC"
 		PREFIX_TMP_GLIBC="$NEW_PREFIX_TMP_GLIBC"
 	fi
