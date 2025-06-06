@@ -68,7 +68,7 @@ termux_install_temporary_glibc() {
 	# Move the extracted glibc into our app namespace and update the prefix
 	if [ -d "$PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC" ]; then
 		mkdir -p "$PATH_TMP_GLIBC/$NEW_PREFIX_TMP_GLIBC"
-		mv -n "$PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC" "$PATH_TMP_GLIBC/$NEW_PREFIX_TMP_GLIBC"
+		cp -an "$PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC/." "$PATH_TMP_GLIBC/$NEW_PREFIX_TMP_GLIBC/"
 		PREFIX_TMP_GLIBC="$NEW_PREFIX_TMP_GLIBC"
 	fi
 	if [ "$multilib_glibc" = "true" ]; then
