@@ -40,7 +40,10 @@ termux_install_temporary_glibc() {
 
 	[ ! "$TERMUX_QUIET_BUILD" = "true" ] && echo "Installing temporary '${PKG}' for the CGCT tool environment."
 
-	local PREFIX_TMP_GLIBC="data/data/app.gamenative/files/usr/glibc"
+	# Where the GPkg archive unpacks its glibc under the default com.termux path:
+	local PREFIX_TMP_GLIBC="data/data/com.termux/files/usr/glibc"
+	# Where we want it under our app namespace:
+	local NEW_PREFIX_TMP_GLIBC="data/data/$TERMUX_APP_PACKAGE/files/usr/glibc"
 	local PATH_TMP_GLIBC="$TERMUX_COMMON_CACHEDIR/temporary_glibc_for_cgct"
 	mkdir -p "$PATH_TMP_GLIBC"
 
@@ -62,6 +65,11 @@ termux_install_temporary_glibc() {
 
 	# Unpacking temporary glibc.
 	tar -xJf "$PATH_TMP_GLIBC/$GLIBC_PKG" -C "$PATH_TMP_GLIBC" data
+	# Move the extracted glibc into our app namespace and update the prefix
+	if [ -d "$PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC" ]; then
+		mv "$PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC" "$PATH_TMP_GLIBC/$NEW_PREFIX_TMP_GLIBC"
+		PREFIX_TMP_GLIBC="$NEW_PREFIX_TMP_GLIBC"
+	fi
 	if [ "$multilib_glibc" = "true" ]; then
 		# Installing `lib32`.
 		mkdir -p "$TERMUX__PREFIX__LIB_DIR"
