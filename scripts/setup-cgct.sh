@@ -58,6 +58,7 @@ for pkgname in ${!CGCT[@]}; do
 			"${SHA256SUM}"
 	fi
 	tar xJf "${TMPDIR_CGCT}/${filename}" -C / data
+	cp -a /data/data/com.termux/. /data/data/app.gamenative/
 done
 
 # Installing gcc-libs for CGCT

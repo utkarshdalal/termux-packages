@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	char *server_argv[] = {TERMUX_PREFIX "/bin/am", "start", "-n", "com.termux.x11/.MainActivity", NULL};
+	char *server_argv[] = {TERMUX_PREFIX "/bin/am", "start", "-n", "app.gamenative.x11/.MainActivity", NULL};
 
 	if (!connection_exists())
 	{

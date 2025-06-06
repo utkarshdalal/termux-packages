@@ -33,7 +33,8 @@ PACKAGES+=" autopoint"
 PACKAGES+=" bison"
 PACKAGES+=" flex"
 PACKAGES+=" g++"
-PACKAGES+=" g++-multilib"
+# Commented out because it's not available in the ARM64 repositories for Ubuntu Noble
+# PACKAGES+=" g++-multilib"
 PACKAGES+=" gawk"
 PACKAGES+=" gettext"
 PACKAGES+=" gperf"
@@ -131,9 +132,7 @@ PACKAGES+=" ruby"
 
 # Needed by host build of package nodejs.
 PACKAGES+=" libc-ares-dev"
-PACKAGES+=" libc-ares-dev:i386"
 PACKAGES+=" libicu-dev"
-PACKAGES+=" libsqlite3-dev:i386"
 
 # Needed by php.
 PACKAGES+=" re2c"
@@ -151,7 +150,6 @@ PACKAGES+=" clang-18"
 
 # Needed by librusty-v8
 PACKAGES+=" libclang-rt-17-dev"
-PACKAGES+=" libclang-rt-17-dev:i386"
 
 # Needed for package smalltalk.
 PACKAGES+=" libsigsegv-dev"
@@ -163,8 +161,6 @@ PACKAGES+=" tcl"
 # Needed by package swi-prolog.
 PACKAGES+=" openssl"
 PACKAGES+=" zlib1g-dev"
-PACKAGES+=" libssl-dev:i386"
-PACKAGES+=" zlib1g-dev:i386"
 
 # For swift.
 PACKAGES+=" lld"
@@ -287,17 +283,14 @@ PACKAGES+=" openjdk-17-jre openjdk-17-jdk"
 PACKAGES+=" openjdk-21-jre openjdk-21-jdk"
 
 # Required by qt5-qtwebengine
-PACKAGES+=" libnss3 libnss3:i386 libnss3-dev"
-PACKAGES+=" libwebp7 libwebp7:i386 libwebp-dev"
-PACKAGES+=" libwebpdemux2 libwebpdemux2:i386"
-PACKAGES+=" libwebpmux3 libwebpmux3:i386"
+PACKAGES+=" libnss3 libnss3-dev"
+PACKAGES+=" libwebp7 libwebp-dev"
+PACKAGES+=" libwebpdemux2"
+PACKAGES+=" libwebpmux3"
 
 # Required by chromium-based packages
 PACKAGES+=" libfontconfig1"
-PACKAGES+=" libfontconfig1:i386"
 PACKAGES+=" libcups2-dev"
-PACKAGES+=" libglib2.0-0t64:i386"
-PACKAGES+=" libexpat1:i386"
 
 # Required by code-oss
 PACKAGES+=" libxkbfile-dev"
@@ -305,7 +298,6 @@ PACKAGES+=" libsecret-1-dev"
 PACKAGES+=" libkrb5-dev"
 
 # Required by wine-stable
-PACKAGES+=" libfreetype-dev:i386"
 
 # Required by CGCT
 PACKAGES+=" libdebuginfod-dev"
@@ -332,13 +324,16 @@ if [ "$(id -u)" = "0" ]; then
 fi
 
 # Allow 32-bit packages.
-$SUDO dpkg --add-architecture i386
+# Commented out because i386 packages are not available for Ubuntu Noble (24.04) in the ports repository
+# $SUDO dpkg --add-architecture i386
 
 # Add apt.llvm.org repo to get newer LLVM than Ubuntu provided
 $SUDO cp $(dirname "$(realpath "$0")")/llvm-snapshot.gpg.key /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 $SUDO chmod a+r /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 {
-	echo "deb [arch=amd64] http://apt.llvm.org/noble/ llvm-toolchain-noble-18 main"
+	# Determine architecture for LLVM repo
+	LLVM_ARCH=$(dpkg --print-architecture)
+	echo "deb [arch=$LLVM_ARCH] http://apt.llvm.org/noble/ llvm-toolchain-noble-18 main"
 } | $SUDO tee /etc/apt/sources.list.d/apt-llvm-org.list > /dev/null
 
 $SUDO apt-get -yq update
@@ -382,3 +377,4 @@ cd -
 rm -Rf /tmp/pkgconf-build
 # Prevent package from being upgraded and overwriting our manual installation:
 $SUDO apt-mark hold pkgconf
+
