@@ -40,10 +40,7 @@ termux_install_temporary_glibc() {
 
 	[ ! "$TERMUX_QUIET_BUILD" = "true" ] && echo "Installing temporary '${PKG}' for the CGCT tool environment."
 
-	# Where the GPkg archive unpacks its glibc under the default com.termux path:
 	local PREFIX_TMP_GLIBC="data/data/com.termux/files/usr/glibc"
-	# Where we want it under our app namespace:
-	local NEW_PREFIX_TMP_GLIBC="data/data/$TERMUX_APP_PACKAGE/files/usr/glibc"
 	local PATH_TMP_GLIBC="$TERMUX_COMMON_CACHEDIR/temporary_glibc_for_cgct"
 	mkdir -p "$PATH_TMP_GLIBC"
 
@@ -65,19 +62,6 @@ termux_install_temporary_glibc() {
 
 	# Unpacking temporary glibc.
 	tar -xJf "$PATH_TMP_GLIBC/$GLIBC_PKG" -C "$PATH_TMP_GLIBC" data
-	# Move the extracted glibc into our app namespace and update the prefix
-	local PREFIX_USED="$PREFIX_TMP_GLIBC"
-	
-	if [ -d "$PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC" ]; then
-		# If we already have a temporary glibc in our namespace, remove it first
-		if [ -d "$PATH_TMP_GLIBC/$NEW_PREFIX_TMP_GLIBC" ]; then
-			rm -rf "$PATH_TMP_GLIBC/$NEW_PREFIX_TMP_GLIBC"
-		fi
-		mkdir -p "$PATH_TMP_GLIBC/$NEW_PREFIX_TMP_GLIBC"
-		# Use cp -a instead of cp -an to allow overwriting existing files
-		cp -a "$PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC/." "$PATH_TMP_GLIBC/$NEW_PREFIX_TMP_GLIBC/"
-		PREFIX_TMP_GLIBC="$NEW_PREFIX_TMP_GLIBC"
-	fi
 	if [ "$multilib_glibc" = "true" ]; then
 		# Installing `lib32`.
 		mkdir -p "$TERMUX__PREFIX__LIB_DIR"
@@ -100,11 +84,11 @@ termux_install_temporary_glibc() {
 		ln -sr "${ld_path}" "$TERMUX__PREFIX__BASE_LIB_DIR/$(basename ${ld_path})"
 	else
 		# Complete installation of glibc components.
-		cp -r "$PATH_TMP_GLIBC/$NEW_PREFIX_TMP_GLIBC/"* "$TERMUX_PREFIX"
+		cp -r "$PATH_TMP_GLIBC/$PREFIX_TMP_GLIBC/"* "$TERMUX_PREFIX"
 	fi
 	# It is necessary to reconfigure the paths in libs for correct
 	# work of multilib-compilation and compilation in forked projects.
-	grep -I -s -r -l "/$PREFIX_TMP_GLIBC/lib/" "$TERMUX__PREFIX__LIB_DIR" | xargs -r sed -i "s|/$PREFIX_TMP_GLIBC/lib/|$TERMUX__PREFIX__LIB_DIR/|g"
+	grep -I -s -r -l "/$PREFIX_TMP_GLIBC/lib/" "$TERMUX__PREFIX__LIB_DIR" | xargs sed -i "s|/$PREFIX_TMP_GLIBC/lib/|$TERMUX__PREFIX__LIB_DIR/|g"
 
 	# Marking the installation of temporary glibc.
 	rm -fr "$PATH_TMP_GLIBC/data"
