@@ -1,7 +1,7 @@
 # Build with:
-#	docker build -t ghcr.io/termux/package-builder .
+#	docker build -t ghcr.io/utkarshdalal/package-builder-gamenative .
 # Push to GitHub registry with:
-#	docker push ghcr.io/termux/package-builder
+#	docker push ghcr.io/utkarshdalal/package-builder-gamenative
 # This is done after changing this file or any of the
 # scripts/setup-{ubuntu,android-sdk,cgct}.sh setup scripts.
 FROM ubuntu:24.04
