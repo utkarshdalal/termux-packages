@@ -989,7 +989,7 @@ TERMUX_PREFIX_CLASSICAL="$TERMUX__PREFIX" # Deprecated alternative variable for 
 #
 # Default value: `glibc`
 ##
-TERMUX__PREFIX_GLIBC_SUBDIR="."
+TERMUX__PREFIX_GLIBC_SUBDIR="glibc"
 
 ##
 # Termux `glibc` prefix directory path under `TERMUX__PREFIX`
@@ -1001,7 +1001,7 @@ TERMUX__PREFIX_GLIBC_SUBDIR="."
 #
 # Default value: `/data/data/app.gamenative/files/usr/glibc`
 ##
-TERMUX__PREFIX_GLIBC="$TERMUX__PREFIX/$TERMUX__PREFIX_GLIBC_SUBDIR"
+TERMUX__PREFIX_GLIBC="$TERMUX__PREFIX"
 __termux_build_props__add_variables_validator_actions "TERMUX__PREFIX_GLIBC" "safe_absolute_path invalid_termux_prefix_paths path_under_termux_rootfs"
 
 
