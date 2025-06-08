@@ -9,18 +9,17 @@
 # FROM ghcr.io/utkarshdalal/package-builder-gamenative
 FROM ghcr.io/utkarshdalal/package-builder-gamenative
 
-USER root
-RUN sed -i 's|/data/data/com.termux|/data/data/app.gamenative|g' \
-        /tmp/termux-packages/scripts/properties.sh && \
-    sed -i 's|"com.termux"|"app.gamenative"|g' \
-        /tmp/termux-packages/scripts/properties.sh
-RUN mv /data/data/com.termux /data/data/app.gamenative
+# USER root
+# RUN sed -i 's|/data/data/com.termux|/data/data/app.gamenative|g' \
+#         /tmp/termux-packages/scripts/properties.sh && \
+#     sed -i 's|"com.termux"|"app.gamenative"|g' \
+#         /tmp/termux-packages/scripts/properties.sh
 
-# Use root to replace the setup-cgct script with our local version run from within scripts/
-COPY setup-cgct.sh /tmp/termux-packages/scripts/setup-cgct.sh
-RUN chown builder:builder /tmp/termux-packages/scripts/setup-cgct.sh && chmod +x /tmp/termux-packages/scripts/setup-cgct.sh
+# # Use root to replace the setup-cgct script with our local version run from within scripts/
+# COPY setup-cgct.sh /tmp/termux-packages/scripts/setup-cgct.sh
+# RUN chown builder:builder /tmp/termux-packages/scripts/setup-cgct.sh && chmod +x /tmp/termux-packages/scripts/setup-cgct.sh
 
-USER builder
+# USER builder
 
 # Now run the setup script
 RUN TERMUX_PKGS__BUILD__IS_DOCKER_BUILD='true' /tmp/termux-packages/scripts/setup-cgct.sh
