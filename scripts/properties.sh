@@ -2231,7 +2231,7 @@ TERMUX_CLEANUP_BUILT_PACKAGES_THRESHOLD="$(( 5 * 1024 ** 3 ))" # 5 GiB
 __termux_build_props__add_variables_validator_actions "TERMUX_CLEANUP_BUILT_PACKAGES_THRESHOLD" "unsigned_int"
 
 # Path to CGCT tools
-CGCT_DEFAULT_PREFIX="/data/data/app.gamenative/files/usr/glibc"
+CGCT_DEFAULT_PREFIX="/data/data/app.gamenative/files/imagefs/usr"
 __termux_build_props__add_variables_validator_actions "CGCT_DEFAULT_PREFIX" "safe_absolute_path invalid_termux_prefix_paths"
 
 export CGCT_DIR="/data/data/app.gamenative/cgct"
