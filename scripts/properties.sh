@@ -2536,11 +2536,11 @@ including the null \`\0\` terminator." 1>&2
         return 1
     fi
 
-    if [[ "$TERMUX__PREFIX" == "$TERMUX__PREFIX_GLIBC" ]]; then
-        echo "The TERMUX__PREFIX '$TERMUX__PREFIX' or TERMUX__PREFIX_GLIBC '$TERMUX__PREFIX_GLIBC' is invalid." 1>&2
-        echo "The TERMUX__PREFIX must not be equal to TERMUX__PREFIX_GLIBC." 1>&2
-        return 1
-    fi
+    # if [[ "$TERMUX__PREFIX" == "$TERMUX__PREFIX_GLIBC" ]]; then
+    #     echo "The TERMUX__PREFIX '$TERMUX__PREFIX' or TERMUX__PREFIX_GLIBC '$TERMUX__PREFIX_GLIBC' is invalid." 1>&2
+    #     echo "The TERMUX__PREFIX must not be equal to TERMUX__PREFIX_GLIBC." 1>&2
+    #     return 1
+    # fi
 
     if [[ "$TERMUX__PREFIX__BASE_LIB_DIR" == "$TERMUX__PREFIX__MULTI_LIB_DIR" ]]; then
         echo "The TERMUX__PREFIX__BASE_LIB_DIR '$TERMUX__PREFIX__BASE_LIB_DIR' or TERMUX__PREFIX__MULTI_LIB_DIR '$TERMUX__PREFIX__MULTI_LIB_DIR' is invalid." 1>&2
