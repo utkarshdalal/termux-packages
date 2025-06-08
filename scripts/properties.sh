@@ -989,7 +989,7 @@ TERMUX_PREFIX_CLASSICAL="$TERMUX__PREFIX" # Deprecated alternative variable for 
 #
 # Default value: `glibc`
 ##
-TERMUX__PREFIX_GLIBC_SUBDIR="glibc"
+TERMUX__PREFIX_GLIBC_SUBDIR="."
 
 ##
 # Termux `glibc` prefix directory path under `TERMUX__PREFIX`
