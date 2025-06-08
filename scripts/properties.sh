@@ -757,7 +757,7 @@ __termux_build_props__add_variables_validator_actions "TERMUX__ROOTFS_ID" "unsig
 #
 # Default value: `files`
 ##
-TERMUX__ROOTFS_SUBDIR="files"
+TERMUX__ROOTFS_SUBDIR="files/imagefs"
 __termux_build_props__add_variables_validator_actions "TERMUX__ROOTFS_SUBDIR" "allow_unset_value safe_relative_path"
 
 ###########
