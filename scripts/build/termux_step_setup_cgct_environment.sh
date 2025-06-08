@@ -40,7 +40,7 @@ termux_install_temporary_glibc() {
 
 	[ ! "$TERMUX_QUIET_BUILD" = "true" ] && echo "Installing temporary '${PKG}' for the CGCT tool environment."
 
-	local PREFIX_TMP_GLIBC="data/data/app.gamenative/files/imagefs/usr"
+	local PREFIX_TMP_GLIBC="data/data/app.gamenative/files/usr/glibc"
 	local PATH_TMP_GLIBC="$TERMUX_COMMON_CACHEDIR/temporary_glibc_for_cgct"
 	mkdir -p "$PATH_TMP_GLIBC"
 
