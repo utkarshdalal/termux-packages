@@ -652,7 +652,8 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 
 		# Handle 'all' arch:
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
-			for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
+			# for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
+			for arch in 'x86_64'; do
 				env TERMUX_ARCH="$arch" TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
 					 $(test "${TERMUX_CLEANUP_BUILT_PACKAGES_ON_LOW_DISK_SPACE:-}" = "true" && echo "-C") \
 					 $(test "${TERMUX_DEBUG_BUILD:-}" = "true" && echo "-d") \
