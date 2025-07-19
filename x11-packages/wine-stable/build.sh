@@ -7,7 +7,7 @@ TERMUX_PKG_VERSION="10.0"
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://dl.winehq.org/wine/source/${TERMUX_PKG_VERSION%%.*}.0/wine-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=c5e0b3f5f7efafb30e9cd4d9c624b85c583171d33549d933cd3402f341ac3601
-TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, opengl, pulseaudio, sdl2 | sdl2-compat, vulkan-loader, xorg-xrandr"
+TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, gst-plugins-base, gstreamer, libandroid-shmem, libandroid-shmem-static, libandroid-spawn, libc++, libgmp, libgnutls, libx11, libxcb, libxcomposite, libxcursor, libxfixes, libxi, libxrandr, libxrender, libxxf86vm, ocl-icd, opencl-headers, opengl, pulseaudio, sdl2 | sdl2-compat, vulkan-loader, xorg-xrandr"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="sdl2-compat, vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, vulkan-loader-generic"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -19,13 +19,13 @@ TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 enable_wineandroid_drv=no
---prefix=$TERMUX_PREFIX/opt/wine-stable
---exec-prefix=$TERMUX_PREFIX/opt/wine-stable
---libdir=$TERMUX_PREFIX/opt/wine-stable/lib
+--prefix=$TERMUX_PREFIX/opt/wine
+--exec-prefix=$TERMUX_PREFIX/opt/wine
+--libdir=$TERMUX_PREFIX/opt/wine/lib
 --with-wine-tools=$TERMUX_PKG_HOSTBUILD_DIR
 --enable-nls
 --disable-tests
---without-alsa
+--with-alsa
 --without-capi
 --without-coreaudio
 --without-cups
@@ -36,12 +36,12 @@ enable_wineandroid_drv=no
 --with-gettextpo=no
 --without-gphoto
 --with-gnutls
---without-gstreamer
+--with-gstreamer
 --without-inotify
 --with-krb5
 --with-mingw
 --without-netapi
---without-opencl
+--with-opencl
 --with-opengl
 --without-osmesa
 --without-oss
@@ -55,6 +55,7 @@ enable_wineandroid_drv=no
 --without-usb
 --without-v4l2
 --with-vulkan
+--with-x
 --with-xcomposite
 --with-xcursor
 --with-xfixes
@@ -65,7 +66,7 @@ enable_wineandroid_drv=no
 --with-xrender
 --without-xshape
 --without-xshm
---without-xxf86vm
+--with-xxf86vm
 "
 
 # Enable win64 on 64-bit arches.
@@ -121,7 +122,7 @@ termux_step_pre_configure() {
 	CXXFLAGS="${CXXFLAGS/-fstack-protector-strong/}"
 	LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
 
-	LDFLAGS+=" -landroid-spawn"
+	# LDFLAGS+=" -landroid-spawn"
 
 	if [ "$TERMUX_ARCH" = "x86_64" ]; then
 		mkdir -p "$TERMUX_PKG_TMPDIR/bin"
