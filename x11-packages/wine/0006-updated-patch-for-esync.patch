@@ -1,0 +1,44 @@
+From a172fc64bc515fd83e551e6422f2f0e28bf86a3f Mon Sep 17 00:00:00 2001
+From: Utkarsh Dalal <utkarsh.dalal@toptal.com>
+Date: Sat, 19 Jul 2025 22:15:29 +0530
+Subject: [PATCH 6/6] updated patch for esync
+
+---
+ server/esync.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/server/esync.c b/server/esync.c
+index 2bb8179..7e473ea 100644
+--- a/server/esync.c
++++ b/server/esync.c
+@@ -64,13 +64,6 @@ static void **shm_addrs;
+ static int shm_addrs_size;  /* length of the allocated shm_addrs array */
+ static long pagesize;
+ 
+-static void shm_cleanup(void)
+-{
+-    close( shm_fd );
+-    if (shm_unlink( shm_name ) == -1)
+-        perror( "shm_unlink" );
+-}
+-
+ static int shm_open(const char *name, int oflag, mode_t mode) {
+     size_t namelen;
+     char *fname;
+@@ -130,6 +123,13 @@ static int shm_unlink(const char *name) {
+     return unlink(fname);
+ }
+ 
++static void shm_cleanup(void)
++{
++    close( shm_fd );
++    if (shm_unlink( shm_name ) == -1)
++        perror( "shm_unlink" );
++}
++
+ void esync_init(void)
+ {
+     struct stat st;
+-- 
+2.43.0
+
