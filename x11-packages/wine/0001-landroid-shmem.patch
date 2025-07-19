@@ -1,0 +1,25 @@
+From 2fb30926c37d3f8ec74b8bf671f974e50bd4b954 Mon Sep 17 00:00:00 2001
+From: Utkarsh Dalal <utkarsh.dalal@toptal.com>
+Date: Sat, 19 Jul 2025 11:50:43 +0530
+Subject: [PATCH] Added landroid-shmem patch
+
+---
+ dlls/winex11.drv/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dlls/winex11.drv/Makefile.in b/dlls/winex11.drv/Makefile.in
+index 6439c78..0cd3547 100755
+--- a/dlls/winex11.drv/Makefile.in
++++ b/dlls/winex11.drv/Makefile.in
+@@ -3,7 +3,7 @@ UNIXLIB   = winex11.so
+ IMPORTS   = uuid user32 gdi32 win32u
+ DELAYIMPORTS = comctl32 ole32 shell32 imm32
+ UNIX_CFLAGS  = $(X_CFLAGS)
+-UNIX_LIBS    = -lwin32u $(X_LIBS) $(X_EXTRA_LIBS) $(PTHREAD_LIBS) -lm
++UNIX_LIBS    = -lwin32u $(X_LIBS) $(X_EXTRA_LIBS) $(PTHREAD_LIBS) -lm -landroid-shmem
+ 
+ SOURCES = \
+ 	bitblt.c \
+-- 
+2.43.0
+
