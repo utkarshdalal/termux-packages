@@ -1,0 +1,33 @@
+From bced5bd1cb9532b7bb1ceae979a0a9fea86f8808 Mon Sep 17 00:00:00 2001
+From: Utkarsh Dalal <utkarsh.dalal@toptal.com>
+Date: Sat, 19 Jul 2025 13:26:55 +0530
+Subject: [PATCH 5/5] fixed pulse build
+
+---
+ dlls/winepulse.drv/pulse.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/dlls/winepulse.drv/pulse.c b/dlls/winepulse.drv/pulse.c
+index 62658fc..26840a1 100755
+--- a/dlls/winepulse.drv/pulse.c
++++ b/dlls/winepulse.drv/pulse.c
+@@ -231,12 +231,16 @@ static int pulse_poll_func(struct pollfd *ufds, unsigned long nfds, int timeout,
+ 
+ static NTSTATUS pulse_process_attach(void *args)
+ {
++#ifdef __ANDROID__
++    if (1)
++#else
+     pthread_mutexattr_t attr;
+ 
+     pthread_mutexattr_init(&attr);
+     pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_INHERIT);
+ 
+     if (pthread_mutex_init(&pulse_mutex, &attr) != 0)
++#endif
+         pthread_mutex_init(&pulse_mutex, NULL);
+ 
+ #ifdef _WIN64
+-- 
+2.43.0
+
