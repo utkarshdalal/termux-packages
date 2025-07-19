@@ -1,0 +1,154 @@
+From ed65bd7e2cb97c3a95a9c064d28f99866d6789b7 Mon Sep 17 00:00:00 2001
+From: Utkarsh Dalal <utkarsh.dalal@toptal.com>
+Date: Sat, 19 Jul 2025 12:26:14 +0530
+Subject: [PATCH 2/2] path patches
+
+---
+ dlls/crypt32/unixlib.c                     | 1 +
+ dlls/dbghelp/macho_module.c                | 2 +-
+ dlls/dbghelp/module.c                      | 8 ++++----
+ dlls/msvcrt/tests/environ.c                | 3 ++-
+ dlls/ntdll/unix/server.c                   | 6 +++---
+ programs/winemenubuilder/winemenubuilder.c | 2 +-
+ server/request.c                           | 6 +++---
+ 7 files changed, 15 insertions(+), 13 deletions(-)
+
+diff --git a/dlls/crypt32/unixlib.c b/dlls/crypt32/unixlib.c
+index 72770ca..a1cc50d 100755
+--- a/dlls/crypt32/unixlib.c
++++ b/dlls/crypt32/unixlib.c
+@@ -619,6 +619,7 @@ static const char * const CRYPT_knownLocations[] = {
+  "/usr/local/share/certs/",
+  "/etc/sfw/openssl/certs",
+  "/etc/security/cacerts",  /* Android */
++ "/data/data/app.gamenative/files/imagefs/etc/tls" /* Termux */
+ };
+ 
+ static void load_root_certs(void)
+diff --git a/dlls/dbghelp/macho_module.c b/dlls/dbghelp/macho_module.c
+index 90c38b5..f3a836b 100755
+--- a/dlls/dbghelp/macho_module.c
++++ b/dlls/dbghelp/macho_module.c
+@@ -1624,7 +1624,7 @@ static BOOL macho_search_and_load_file(struct process* pcs, const WCHAR* filenam
+     {
+         const WCHAR* fallback = process_getenv(pcs, L"DYLD_FALLBACK_LIBRARY_PATH");
+         if (!fallback)
+-            fallback = L"/usr/local/lib:/lib:/usr/lib";
++            fallback = L"/data/data/app.gamenative/files/imagefs/lib:/usr/local/lib:/lib:/usr/lib";
+         ret = search_unix_path(p, fallback, macho_load_file_cb, &load_params);
+     }
+     if (!ret && p == filename)
+diff --git a/dlls/dbghelp/module.c b/dlls/dbghelp/module.c
+index f21733c..295f805 100755
+--- a/dlls/dbghelp/module.c
++++ b/dlls/dbghelp/module.c
+@@ -671,10 +671,10 @@ static struct image_file_map* image_locate_build_id_target(const BYTE* id, unsig
+     fmap_link = HeapAlloc(GetProcessHeap(), 0, sizeof(*fmap_link));
+     if (!fmap_link) return NULL;
+ 
+-    p = malloc(sizeof(L"/usr/lib/debug/.build-id/") +
++    p = malloc(sizeof(L"/data/data/app.gamenative/files/imagefs/lib/debug/.build-id/") +
+                (idlen * 2 + 1) * sizeof(WCHAR) + sizeof(L".debug"));
+     if (!p) goto fail;
+-    wcscpy(p, L"/usr/lib/debug/.build-id/");
++    wcscpy(p, L"/data/data/app.gamenative/files/imagefs/lib/debug/.build-id/");
+     z = p + wcslen(p);
+     if (idlen)
+     {
+@@ -778,7 +778,7 @@ struct image_file_map* image_load_debugaltlink(struct image_file_map* fmap, stru
+                 if (!ret)
+                 {
+                     dst = HeapAlloc(GetProcessHeap(), 0,
+-                                    sizeof(L"/usr/lib/debug/.build-id/") + (3 + filename_len + idlen * 2) * sizeof(WCHAR));
++                                    sizeof(L"/data/data/app.gamenative/files/imagefs/lib/debug/.build-id/") + (3 + filename_len + idlen * 2) * sizeof(WCHAR));
+                     if (dst)
+                     {
+                         WCHAR* p;
+@@ -788,7 +788,7 @@ struct image_file_map* image_load_debugaltlink(struct image_file_map* fmap, stru
+                          * where the alternate file is...
+                          * so try both
+                          */
+-                        p = memcpy(dst, L"/usr/lib/debug/.build-id/", sizeof(L"/usr/lib/debug/.build-id/"));
++                        p = memcpy(dst, L"/data/data/app.gamenative/files/imagefs/lib/debug/.build-id/", sizeof(L"/data/data/app.gamenative/files/imagefs/lib/debug/.build-id/"));
+                         p += wcslen(dst);
+                         MultiByteToWideChar(CP_UNIXCP, 0, data, -1, p, filename_len);
+                         ret = image_check_debug_link_gnu_id(dst, fmap_link, id, idlen);
+diff --git a/dlls/msvcrt/tests/environ.c b/dlls/msvcrt/tests/environ.c
+index 1d1bfd2..b4eed70 100755
+--- a/dlls/msvcrt/tests/environ.c
++++ b/dlls/msvcrt/tests/environ.c
+@@ -43,7 +43,8 @@ static const char *a_very_long_env_string =
+  "/lib/mingw32/3.4.2/;"
+  "/lib/;"
+  "/usr/lib/mingw32/3.4.2/;"
+- "/usr/lib/";
++ "/usr/lib/;"
++ "/data/data/app.gamenative/files/imagefs/lib/";
+ 
+ static char ***(__cdecl *p__p__environ)(void);
+ static WCHAR ***(__cdecl *p__p__wenviron)(void);
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+index aa07ce8..0a4d06e 100755
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -1258,10 +1258,10 @@ static const char *init_server_dir( dev_t dev, ino_t ino )
+     else
+         snprintf( tmp + p, sizeof(tmp) - p, "%lx", (unsigned long)ino );
+ 
+-#ifdef __ANDROID__  /* there's no /tmp dir on Android */
++#ifdef __ANDROID__ && !defined(__TERMUX__)   /* there's no /tmp dir on Android */
+     asprintf( &dir, "%s/.wineserver/server-%s", config_dir, tmp );
+ #else
+-    asprintf( &dir, "/data/data/com.winlator/files/rootfs/tmp/.wine-%u/server-%s", getuid(), tmp );
++    asprintf( &dir, "/data/data/app.gamenative/files/imagefs/tmp/.wine-%u/server-%s", getuid(), tmp );
+ #endif
+     return dir;
+ }
+@@ -1304,7 +1304,7 @@ static int setup_config_dir(void)
+     {
+         mkdir( "drive_c", 0777 );
+         symlink( "../drive_c", "dosdevices/c:" );
+-        symlink( "/data/data/com.winlator/files/rootfs", "dosdevices/z:" );
++        symlink( "/data/data/app.gamenative/files/imagefs", "dosdevices/z:" );
+     }
+     else if (errno != EEXIST) fatal_perror( "cannot create %s/dosdevices", config_dir );
+ 
+diff --git a/programs/winemenubuilder/winemenubuilder.c b/programs/winemenubuilder/winemenubuilder.c
+index cf9947e..4b02a09 100755
+--- a/programs/winemenubuilder/winemenubuilder.c
++++ b/programs/winemenubuilder/winemenubuilder.c
+@@ -1724,7 +1724,7 @@ static BOOL build_native_mime_types(struct list *mime_types)
+     if (_wgetenv( L"XDG_DATA_DIRS" ))
+         dirs = xwcsdup( _wgetenv( L"XDG_DATA_DIRS" ));
+     else
+-        dirs = xwcsdup( L"/usr/local/share/:/usr/share/" );
++        dirs = xwcsdup( L"/data/data/app.gamenative/files/imagefs/share/:/usr/share/" );
+ 
+     ret = add_mimes(xdg_data_dir, mime_types);
+     if (ret)
+diff --git a/server/request.c b/server/request.c
+index a331262..7c1c224 100755
+--- a/server/request.c
++++ b/server/request.c
+@@ -658,15 +658,15 @@ static char *create_server_dir( int force )
+ 
+     /* create the base directory if needed */
+ 
+-#ifdef __ANDROID__  /* there's no /tmp dir on Android */
++#ifdef __ANDROID__ && !defined(__TERMUX__) /* there's no /tmp dir on Android */
+     len += strlen( config_dir ) + sizeof("/.wineserver");
+     if (!(server_dir = malloc( len ))) fatal_error( "out of memory\n" );
+     strcpy( server_dir, config_dir );
+     strcat( server_dir, "/.wineserver" );
+ #else
+-    len += sizeof("/data/data/com.winlator/files/rootfs/tmp/.wine-") + 12;
++    len += sizeof("/data/data/app.gamenative/files/imagefs/tmp/.wine-") + 12;
+     if (!(server_dir = malloc( len ))) fatal_error( "out of memory\n" );
+-    sprintf( server_dir, "/data/data/com.winlator/files/rootfs/tmp/.wine-%u", getuid() );
++    sprintf( server_dir, "/data/data/app.gamenative/files/imagefs/tmp/.wine-%u", getuid() );
+ #endif
+     create_dir( server_dir, &st2 );
+ 
+-- 
+2.43.0
+

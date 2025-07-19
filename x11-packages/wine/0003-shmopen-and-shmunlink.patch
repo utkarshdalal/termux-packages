@@ -1,0 +1,153 @@
+From 0c861ef347f127605b10e7afb238f49b78096885 Mon Sep 17 00:00:00 2001
+From: Utkarsh Dalal <utkarsh.dalal@toptal.com>
+Date: Sat, 19 Jul 2025 12:53:23 +0530
+Subject: [PATCH 3/3] shmopen and shmunlink
+
+---
+ dlls/ntdll/unix/esync.c | 59 +++++++++++++++++++++++++++++++++++++++++
+ server/esync.c          | 59 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 118 insertions(+)
+
+diff --git a/dlls/ntdll/unix/esync.c b/dlls/ntdll/unix/esync.c
+index 2892432..f8ae973 100755
+--- a/dlls/ntdll/unix/esync.c
++++ b/dlls/ntdll/unix/esync.c
+@@ -142,6 +142,65 @@ static void *get_shm( unsigned int idx )
+     return ret;
+ }
+ 
++static int shm_open(const char *name, int oflag, mode_t mode) {
++    size_t namelen;
++    char *fname;
++    int fd;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("/data/data/app.gamenative/files/imagefs/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "/data/data/app.gamenative/files/imagefs/tmp/", sizeof("/data/data/app.gamenative/files/imagefs/tmp/") - 1);
++    memcpy(fname + sizeof("/data/data/app.gamenative/files/imagefs/tmp/") - 1, name, namelen + 1);
++
++    fd = open(fname, oflag, mode);
++    if (fd != -1) {
++        /* We got a descriptor.  Now set the FD_CLOEXEC bit.  */
++        int flags = fcntl(fd, F_GETFD, 0);
++        flags |= FD_CLOEXEC;
++        flags = fcntl(fd, F_SETFD, flags);
++
++        if (flags == -1) {
++            /* Something went wrong.  We cannot return the descriptor.  */
++            int save_errno = errno;
++            close(fd);
++            fd = -1;
++            errno = save_errno;
++        }
++    }
++
++    return fd;
++}
++
++static int shm_unlink(const char *name) {
++    size_t namelen;
++    char *fname;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("/data/data/app.gamenative/files/imagefs/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "/data/data/app.gamenative/files/imagefs/tmp/", sizeof("/data/data/app.gamenative/files/imagefs/tmp/") - 1);
++    memcpy(fname + sizeof("/data/data/app.gamenative/files/imagefs/tmp/") - 1, name, namelen + 1);
++
++    return unlink(fname);
++}
++
+ /* We'd like lookup to be fast. To that end, we use a static list indexed by handle.
+  * This is copied and adapted from the fd cache code. */
+ 
+diff --git a/server/esync.c b/server/esync.c
+index e193f61..2bb8179 100644
+--- a/server/esync.c
++++ b/server/esync.c
+@@ -71,6 +71,65 @@ static void shm_cleanup(void)
+         perror( "shm_unlink" );
+ }
+ 
++static int shm_open(const char *name, int oflag, mode_t mode) {
++    size_t namelen;
++    char *fname;
++    int fd;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("/data/data/app.gamenative/files/imagefs/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "/data/data/app.gamenative/files/imagefs/tmp/", sizeof("/data/data/app.gamenative/files/imagefs/tmp/") - 1);
++    memcpy(fname + sizeof("/data/data/app.gamenative/files/imagefs/tmp/") - 1, name, namelen + 1);
++
++    fd = open(fname, oflag, mode);
++    if (fd != -1) {
++        /* We got a descriptor.  Now set the FD_CLOEXEC bit.  */
++        int flags = fcntl(fd, F_GETFD, 0);
++        flags |= FD_CLOEXEC;
++        flags = fcntl(fd, F_SETFD, flags);
++
++        if (flags == -1) {
++            /* Something went wrong.  We cannot return the descriptor.  */
++            int save_errno = errno;
++            close(fd);
++            fd = -1;
++            errno = save_errno;
++        }
++    }
++
++    return fd;
++}
++
++static int shm_unlink(const char *name) {
++    size_t namelen;
++    char *fname;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("/data/data/app.gamenative/files/imagefs/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "/data/data/app.gamenative/files/imagefs/tmp/", sizeof("/data/data/app.gamenative/files/imagefs/tmp/") - 1);
++    memcpy(fname + sizeof("/data/data/app.gamenative/files/imagefs/tmp/") - 1, name, namelen + 1);
++
++    return unlink(fname);
++}
++
+ void esync_init(void)
+ {
+     struct stat st;
+-- 
+2.43.0
+

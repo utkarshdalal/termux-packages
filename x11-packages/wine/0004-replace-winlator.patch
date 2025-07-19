@@ -1,0 +1,25 @@
+From 8a81ec8cbc1823f7e0a21f838f78c6ed15200c3a Mon Sep 17 00:00:00 2001
+From: Utkarsh Dalal <utkarsh.dalal@toptal.com>
+Date: Sat, 19 Jul 2025 12:55:14 +0530
+Subject: [PATCH 4/4] replace winlator
+
+---
+ server/unicode.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/server/unicode.c b/server/unicode.c
+index 5f985f4..94bb01d 100755
+--- a/server/unicode.c
++++ b/server/unicode.c
+@@ -277,7 +277,7 @@ static char *get_nls_dir(void)
+ /* load the case mapping table */
+ struct fd *load_intl_file(void)
+ {
+-    static const char *nls_dirs[] = { NULL, NLSDIR, "/data/data/com.winlator/files/rootfs/usr/local/share/wine/nls", "/data/data/com.winlator/files/rootfs/usr/share/wine/nls" };
++    static const char *nls_dirs[] = { NULL, NLSDIR, "/data/data/app.gamenative/files/imagefs/usr/local/share/wine/nls", "/data/data/app.gamenative/files/imagefs/usr/share/wine/nls" };
+     static const WCHAR nt_pathW[] = {'C',':','\\','w','i','n','d','o','w','s','\\',
+         's','y','s','t','e','m','3','2','\\','l','_','i','n','t','l','.','n','l','s',0};
+     static const struct unicode_str nt_name = { nt_pathW, sizeof(nt_pathW) };
+-- 
+2.43.0
+
